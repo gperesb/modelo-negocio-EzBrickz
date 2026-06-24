@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EzBrickz · Fundamentos</title>
+<style>
+  :root{
+    --bg:#0F141A;--surface:#1A222C;--elevated:#232E3A;--accent:#38BFFF;--accent-deep:#1E6FB8;
+    --text:#EAF1F7;--text-dim:#8FA3B5;--border:#2C3845;--danger:#E5604D;--success:#46C28E;--warning:#E8B34A;
+    --radius-sm:8px;--radius:14px;--radius-lg:22px;--maxw:1080px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .stud-row{display:flex;gap:7px;align-items:center}
+  .stud{width:13px;height:13px;border-radius:50%;background:var(--accent);box-shadow:inset 0 -2px 3px rgba(0,0,0,.35);display:inline-block}
+  .stud.dim{background:var(--border)}
+  header.topbar{position:sticky;top:0;z-index:50;background:rgba(15,20,26,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .logo{display:flex;align-items:center;gap:11px;font-weight:800;font-size:21px;letter-spacing:-.02em}
+  .logo span.blue{color:var(--accent)}
+  nav.tabs{display:flex;gap:4px;flex-wrap:wrap}
+  nav.tabs a{color:var(--text-dim);text-decoration:none;font-size:13.5px;font-weight:600;padding:8px 12px;border-radius:999px;transition:.2s}
+  nav.tabs a:hover{color:var(--text);background:var(--elevated)}
+  nav.tabs a.active{color:var(--accent);background:rgba(56,191,255,.12)}
+  @media(max-width:900px){nav.tabs{display:none}}
+  .hero{padding:80px 0 40px;position:relative}
+  .hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(900px 380px at 78% -8%,rgba(56,191,255,.16),transparent 70%)}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;margin-bottom:22px}
+  .hero h1{font-size:clamp(2.1rem,4.6vw,3.3rem);line-height:1.06;letter-spacing:-.03em;font-weight:850;max-width:18ch}
+  .hero p.lead{margin-top:20px;font-size:clamp(1.02rem,1.8vw,1.2rem);color:var(--text-dim);max-width:60ch}
+  section.block{padding:54px 0;border-top:1px solid var(--border)}
+  .sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:14px}
+  .sec-num{font-size:13px;font-weight:800;color:var(--accent);letter-spacing:.1em;border:1px solid var(--accent);border-radius:8px;padding:3px 9px;flex:none}
+  .sec-head h2{font-size:clamp(1.6rem,3.4vw,2.3rem);letter-spacing:-.02em;font-weight:800}
+  .sec-intro{color:var(--text-dim);font-size:1.05rem;max-width:74ch;margin-bottom:34px}
+  .mv-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:760px){.mv-grid{grid-template-columns:1fr}}
+  .mv{border-radius:var(--radius-lg);border:1px solid var(--border);padding:30px 30px;background:var(--surface);position:relative;overflow:hidden}
+  .mv.accent{background:linear-gradient(135deg,rgba(56,191,255,.12),rgba(30,111,184,.04));border-color:var(--accent-deep)}
+  .mv .lbl{font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+  .mv .big{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;line-height:1.25}
+  .mv p.desc{margin-top:14px;color:var(--text-dim);font-size:.98rem}
+  .values{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+  @media(max-width:760px){.values{grid-template-columns:1fr}}
+  .value{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;border-left:3px solid var(--accent);transition:.2s}
+  .value:hover{background:var(--elevated)}
+  .value h4{font-size:1.08rem;margin-bottom:5px}
+  .value p{color:var(--text-dim);font-size:.94rem}
+  .uvp{margin-top:8px;border-radius:var(--radius-lg);padding:34px 36px;background:linear-gradient(135deg,rgba(56,191,255,.13),rgba(30,111,184,.05));border:1px solid var(--accent-deep)}
+  .uvp .stud-row{margin-bottom:16px}
+  .uvp .statement{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;line-height:1.3;max-width:30ch}
+  .uvp .statement .hl{color:var(--accent)}
+  .uvp .sub{margin-top:16px;color:var(--text);font-size:1.02rem;max-width:64ch}
+  .uvp .formula{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .uvp .ftag{font-size:.85rem;font-weight:700;background:var(--surface);border:1px solid var(--border);padding:7px 13px;border-radius:999px}
+  .uvp .plus{color:var(--accent);font-weight:800}
+  footer{border-top:1px solid var(--border);padding:40px 0 60px;color:var(--text-dim);font-size:.88rem}
+  footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:flex-end}
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap">
+    <div class="logo"><img src="EzBLogo.png" alt="EzBrickz" style="height:40px;width:auto;border-radius:9px"></div>
+    <nav class="tabs">
+      <a href="index.html">Visión general</a>
+      <a href="01-fundamentos.html" class="active">Fundamentos</a>
+      <a href="02-clientes.html">Clientes</a>
+      <a href="03-finanzas.html">Finanzas</a>
+      <a href="04-empresa.html">Empresa</a>
+      <a href="00-resumen.html">Resumen</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow"><span class="stud-row"><i class="stud"></i><i class="stud"></i><i class="stud dim"></i></span> Modelo de negocio · Fundamentos</div>
+    <h1>Quiénes somos y a dónde vamos.</h1>
+    <p class="lead">La base sobre la que se apoya todo el negocio: la razón de existir de EzBrickz, la ambición que lo guía, los principios con los que se construye y la promesa que lo separa de todo lo demás en el mercado.</p>
+  </div>
+</section>
+
+<section class="block" id="mv">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="sec-num">01</span><h2>Misión y visión</h2></div>
+    <p class="sec-intro">La misión describe lo que EzBrickz hace hoy y para quién. La visión describe en lo que aspira a convertirse. Una ancla el presente con un propósito; la otra marca el rumbo que orienta cada decisión.</p>
+    <div class="mv-grid">
+      <div class="mv">
+        <div class="lbl">Misión</div>
+        <div class="big">Ser la experiencia completa del coleccionista de LEGO.</div>
+        <p class="desc">Reunir en un solo lugar todo lo que un coleccionista necesita —organizar su colección, comprar y vender, y vivir su afición acompañado de una comunidad— dentro de una experiencia moderna, cálida y diseñada específicamente para él.</p>
+      </div>
+      <div class="mv accent">
+        <div class="lbl">Visión</div>
+        <div class="big">Ser la app que todo coleccionista de LEGO debe tener.</div>
+        <p class="desc">Convertirse en el estándar del coleccionismo de LEGO: la primera aplicación que alguien instala cuando empieza a coleccionar, y la que lo acompaña a lo largo de toda su trayectoria.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="valores">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Valores</h2></div>
+    <p class="sec-intro">Los principios que orientan cómo se construye EzBrickz y cómo se resuelven las decisiones difíciles.</p>
+    <div class="values">
+      <div class="value">
+        <h4>Comunidad primero</h4>
+        <p>Las personas importan más que la transacción. EzBrickz existe para servir a los coleccionistas, no para extraer valor de cada operación. Cuando una decisión fortalece a la comunidad, esa decisión tiene prioridad.</p>
+      </div>
+      <div class="value">
+        <h4>Justos con el coleccionista</h4>
+        <p>Comprar y vender entre coleccionistas no tiene comisión. El negocio no crece a costa de la afición de la gente, sino acompañando a quienes hacen de ella una actividad profesional.</p>
+      </div>
+      <div class="value">
+        <h4>Hecho por coleccionistas</h4>
+        <p>Construido por personas que viven la afición y entienden sus matices. Ese conocimiento de primera mano se refleja en cada función de la aplicación.</p>
+      </div>
+      <div class="value">
+        <h4>Transparencia</h4>
+        <p>Precios y valores reales, reputación verificable e información clara. El coleccionista siempre sabe qué posee, cuánto vale y con quién está tratando.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="uvp">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Propuesta de valor</h2></div>
+    <p class="sec-intro">La promesa central que distingue a EzBrickz: aquello que ningún competidor ofrece y que resume su razón de ser.</p>
+    <div class="uvp">
+      <div class="stud-row"><i class="stud"></i><i class="stud"></i><i class="stud"></i></div>
+      <div class="statement">La primera <span class="hl">red social</span> con marketplace integrado para coleccionistas de LEGO, sin comisiones.</div>
+      <p class="sub">Donde las plataformas existentes son tiendas frías pensadas solo para transaccionar, EzBrickz es el lugar donde el coleccionista vive su afición: organiza su colección, se conecta con otros y compra y vende sin que nadie le cobre por hacerlo.</p>
+      <div class="formula">
+        <span class="ftag">Comunidad</span><span class="plus">+</span>
+        <span class="ftag">Marketplace sin comisiones</span><span class="plus">+</span>
+        <span class="ftag">Inventario inteligente</span><span class="plus">=</span>
+        <span class="ftag" style="background:rgba(56,191,255,.16);border-color:var(--accent-deep);color:var(--accent)">La experiencia completa</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <div class="logo" style="font-size:18px;margin-bottom:10px"><img src="EzBLogo.png" alt="EzBrickz" style="height:30px;width:auto;border-radius:7px"></div>
+      <div>Modelo de negocio · Fundamentos · Junio 2026</div>
+    </div>
+    <div style="color:var(--text-dim)">Mercado objetivo: USA, México y Latinoamérica</div>
+  </div>
+</footer>
+
+<script>
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

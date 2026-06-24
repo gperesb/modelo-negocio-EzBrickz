@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EzBrickz · Modelo de Negocio</title>
+<style>
+  :root{
+    --bg:#0F141A;--surface:#1A222C;--elevated:#232E3A;--accent:#38BFFF;--accent-deep:#1E6FB8;
+    --text:#EAF1F7;--text-dim:#8FA3B5;--border:#2C3845;--danger:#E5604D;--success:#46C28E;--warning:#E8B34A;
+    --radius-sm:8px;--radius:14px;--radius-lg:22px;--maxw:1080px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .stud-row{display:flex;gap:7px;align-items:center}
+  .stud{width:13px;height:13px;border-radius:50%;background:var(--accent);box-shadow:inset 0 -2px 3px rgba(0,0,0,.35);display:inline-block}
+  .stud.dim{background:var(--border)}
+  header.topbar{position:sticky;top:0;z-index:50;background:rgba(15,20,26,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .logo{display:flex;align-items:center;gap:11px;font-weight:800;font-size:21px;letter-spacing:-.02em}
+  .logo span.blue{color:var(--accent)}
+  nav.tabs{display:flex;gap:4px;flex-wrap:wrap}
+  nav.tabs a{color:var(--text-dim);text-decoration:none;font-size:13.5px;font-weight:600;padding:8px 12px;border-radius:999px;transition:.2s}
+  nav.tabs a:hover{color:var(--text);background:var(--elevated)}
+  nav.tabs a.active{color:var(--accent);background:rgba(56,191,255,.12)}
+  @media(max-width:900px){nav.tabs{display:none}}
+  .hero{padding:90px 0 70px;position:relative}
+  .hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(900px 380px at 78% -8%,rgba(56,191,255,.16),transparent 70%)}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;margin-bottom:22px}
+  .hero h1{font-size:clamp(2.3rem,5.4vw,4rem);line-height:1.04;letter-spacing:-.03em;font-weight:850;max-width:17ch}
+  .hero h1 .hl{color:var(--accent)}
+  .hero p.lead{margin-top:24px;font-size:clamp(1.05rem,2vw,1.3rem);color:var(--text-dim);max-width:62ch}
+  .hero .meta{margin-top:34px;display:flex;flex-wrap:wrap;gap:10px}
+  .chip{font-size:13px;font-weight:600;color:var(--text);background:var(--surface);border:1px solid var(--border);padding:8px 14px;border-radius:999px}
+  .chip b{color:var(--accent)}
+  section.block{padding:64px 0;border-top:1px solid var(--border)}
+  .sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:14px}
+  .sec-num{font-size:13px;font-weight:800;color:var(--accent);letter-spacing:.1em;border:1px solid var(--accent);border-radius:8px;padding:3px 9px;flex:none}
+  .sec-head h2{font-size:clamp(1.6rem,3.4vw,2.3rem);letter-spacing:-.02em;font-weight:800}
+  .sec-intro{color:var(--text-dim);font-size:1.05rem;max-width:74ch;margin-bottom:34px}
+  .grid{display:grid;gap:16px}
+  .grid.c2{grid-template-columns:repeat(2,1fr)}
+  .grid.c3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:860px){.grid.c2,.grid.c3{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;transition:.22s}
+  .card:hover{border-color:var(--accent-deep);transform:translateY(-3px)}
+  .card h4{font-size:1.12rem;margin-bottom:4px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.04em;text-transform:uppercase}
+  .tag.threat{background:rgba(229,96,77,.16);color:var(--danger)}
+  .tag.weak{background:rgba(232,179,74,.16);color:var(--warning)}
+  .tag.comp{background:rgba(70,194,142,.16);color:var(--success)}
+  .tag.chaos{background:rgba(143,163,181,.16);color:var(--text-dim)}
+  .card .role{color:var(--text-dim);font-size:.82rem;margin-bottom:12px;font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+  .card ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .card li{font-size:.93rem;padding-left:20px;position:relative;color:var(--text)}
+  .card li.plus::before{content:"+";position:absolute;left:0;color:var(--success);font-weight:800}
+  .card li.minus::before{content:"\2013";position:absolute;left:0;color:var(--danger);font-weight:800}
+  .problem{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:760px){.problem{grid-template-columns:1fr}}
+  .pcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;border-top:3px solid var(--danger)}
+  .pcard h4{font-size:1.05rem;margin-bottom:6px}
+  .pcard p{color:var(--text-dim);font-size:.94rem}
+  .insight{margin-top:26px;border-radius:var(--radius-lg);padding:30px 32px;background:linear-gradient(135deg,rgba(56,191,255,.12),rgba(30,111,184,.05));border:1px solid var(--accent-deep);position:relative;overflow:hidden}
+  .insight .stud-row{margin-bottom:14px}
+  .insight h3{font-size:1.25rem;margin-bottom:8px}
+  .insight p{color:var(--text);font-size:1.02rem}
+  .traction{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:760px){.traction{grid-template-columns:1fr 1fr}}
+  .tcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;text-align:left}
+  .tcard .v{font-size:1.7rem;font-weight:850;color:var(--accent);letter-spacing:-.02em;line-height:1.1}
+  .tcard .k{font-size:.86rem;color:var(--text-dim);margin-top:8px}
+  .streams{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:8px}
+  @media(max-width:860px){.streams{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.streams{grid-template-columns:1fr}}
+  .stream{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative}
+  .stream .rank{font-size:.7rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px}
+  .stream h4{font-size:1.05rem;margin-bottom:6px}
+  .stream p{font-size:.9rem;color:var(--text-dim)}
+  .stream.motor{background:linear-gradient(150deg,rgba(56,191,255,.14),rgba(30,111,184,.05));border-color:var(--accent-deep)}
+  .stream.motor .rank{color:var(--accent)}
+  .stream .price{font-size:.8rem;color:var(--success);font-weight:700;margin-top:8px}
+  .stream .free{font-size:.8rem;color:var(--text-dim);font-weight:700;margin-top:8px}
+  .ezb{margin-top:24px;border-radius:var(--radius-lg);border:1px solid var(--accent-deep);overflow:hidden}
+  .ezb .ezb-head{padding:24px 26px;background:linear-gradient(135deg,rgba(56,191,255,.14),rgba(30,111,184,.04));border-bottom:1px solid var(--border)}
+  .ezb .ezb-head .badge{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+  .ezb .ezb-head h3{font-size:1.5rem;margin:6px 0 4px;letter-spacing:-.02em}
+  .ezb .ezb-head p{color:var(--text-dim);font-size:1rem;max-width:70ch}
+  .ezb .ezb-body{padding:24px 26px;display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  @media(max-width:760px){.ezb .ezb-body{grid-template-columns:1fr}}
+  .ezb .col h5{font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;font-weight:800}
+  .ezb .col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+  .ezb .col li{font-size:.95rem;padding-left:24px;position:relative}
+  .ezb .col li::before{content:"";position:absolute;left:0;top:7px;width:11px;height:11px;border-radius:3px;background:var(--accent)}
+  .ezb .col li b{color:var(--text)}
+  .ezb .hook{margin:0 26px 26px;border-radius:var(--radius);background:var(--elevated);border-left:3px solid var(--success);padding:18px 20px}
+  .ezb .hook h5{color:var(--success);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;font-weight:800}
+  .ezb .hook p{font-size:.98rem}
+  .ezb .hook .quote{display:block;margin-top:8px;font-size:1.05rem;font-weight:700;color:var(--accent)}
+  .prop{border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;background:var(--surface);margin-bottom:22px}
+  .prop .ph{padding:24px 26px;border-bottom:1px solid var(--border);position:relative}
+  .prop .ph .letter{position:absolute;top:20px;right:24px;font-size:3.2rem;font-weight:850;color:var(--elevated);line-height:1}
+  .prop .badge{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+  .prop h3{font-size:1.5rem;margin:6px 0 2px;letter-spacing:-.02em;max-width:24ch}
+  .prop .tagline{color:var(--text-dim);font-style:italic;font-size:1.02rem}
+  .prop .pb{padding:22px 26px;display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  @media(max-width:760px){.prop .pb{grid-template-columns:1fr}}
+  .field h5{font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;font-weight:800}
+  .field p{font-size:.96rem;color:var(--text)}
+  .field.full{grid-column:1/-1}
+  .field.hookf{background:var(--elevated);border-radius:var(--radius);padding:16px 18px;border-left:3px solid var(--accent)}
+  .field.hookf h5{color:var(--accent)}
+  .risk{background:var(--elevated);border-radius:var(--radius);padding:16px 18px;border-left:3px solid var(--danger)}
+  .risk h5{color:var(--danger)}
+  .money-line{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .money-line .mt{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--elevated);color:var(--text-dim);border:1px solid var(--border)}
+  .money-line .mt.on{background:rgba(56,191,255,.16);color:var(--accent);border-color:var(--accent-deep)}
+  .tablewrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius);margin-top:8px}
+  table{width:100%;border-collapse:collapse;min-width:640px}
+  th,td{text-align:left;padding:13px 16px;font-size:.92rem;border-bottom:1px solid var(--border)}
+  thead th{background:var(--accent-deep);color:#fff;font-weight:700;letter-spacing:.02em}
+  thead th:first-child{border-top-left-radius:var(--radius)}
+  thead th:last-child{border-top-right-radius:var(--radius)}
+  tbody tr:hover{background:var(--elevated)}
+  td:first-child{font-weight:700;color:var(--text-dim)}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+  .d-hi{background:var(--success)}.d-mid{background:var(--warning)}.d-lo{background:var(--danger)}
+  .vision{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+  @media(max-width:760px){.vision{grid-template-columns:1fr}}
+  .vcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;border-left:3px solid var(--accent)}
+  .vcard h4{font-size:1.08rem;margin-bottom:6px}
+  .vcard p{color:var(--text-dim);font-size:.94rem}
+  footer{border-top:1px solid var(--border);padding:40px 0 60px;color:var(--text-dim);font-size:.88rem}
+  footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:flex-end}
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap">
+    <div class="logo"><img src="EzBLogo.png" alt="EzBrickz" style="height:40px;width:auto;border-radius:9px"></div>
+    <nav class="tabs">
+      <a href="index.html" class="active">Visión general</a>
+      <a href="01-fundamentos.html">Fundamentos</a>
+      <a href="02-clientes.html">Clientes</a>
+      <a href="03-finanzas.html">Finanzas</a>
+      <a href="04-empresa.html">Empresa</a>
+      <a href="00-resumen.html">Resumen</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow"><span class="stud-row"><i class="stud"></i><i class="stud"></i><i class="stud dim"></i></span> Modelo de negocio · 2026</div>
+    <h1>La primera <span class="hl">red social</span> con marketplace integrado para coleccionistas de LEGO.</h1>
+    <p class="lead">Las plataformas que existen hoy son frías y puramente transaccionales. EzBrickz invierte ese modelo: una comunidad donde el coleccionista vive su afición, y donde comprar, vender y organizar la colección ocurre de forma natural y sin comisiones. El negocio se sostiene por otra vía.</p>
+    <div class="meta">
+      <span class="chip">Mercado inicial · <b>USA, México y Latinoamérica</b></span>
+      <span class="chip">Estado · <b>Producto funcional (MVP)</b></span>
+      <span class="chip">Categoría · <b>Comunidad + marketplace</b></span>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="problema">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="sec-num">01</span><h2>El problema</h2></div>
+    <p class="sec-intro">El coleccionista de LEGO vive su afición repartido entre herramientas que no se hablan entre sí y plataformas que nunca se pensaron para él. No existe un lugar único que reúna todo lo que necesita.</p>
+    <div class="problem">
+      <div class="pcard"><h4>Herramientas fragmentadas</h4><p>Una app para catalogar, otra para precios, una hoja de cálculo para el inventario. Nada está conectado y la experiencia es tediosa.</p></div>
+      <div class="pcard"><h4>Plataformas frías</h4><p>Los marketplaces existentes son tiendas impersonales: cobran comisión por cada venta, tienen interfaces anticuadas y carecen de comunidad.</p></div>
+      <div class="pcard"><h4>Comercio informal y caótico</h4><p>Gran parte de la compraventa ocurre en redes sociales y mensajería, sin estructura, sin protección y sin reputación verificable.</p></div>
+    </div>
+    <div class="insight">
+      <div class="stud-row"><i class="stud"></i><i class="stud"></i><i class="stud"></i></div>
+      <h3>El coleccionista no tiene un hogar</h3>
+      <p>Reúne todas las piezas de su afición de forma dispersa porque nadie le ha ofrecido un lugar donde organizar su colección, conectarse con otros y comerciar, todo en una misma experiencia pensada para él. Ese vacío es la oportunidad de EzBrickz.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="producto">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="sec-num">02</span><h2>La solución</h2></div>
+    <p class="sec-intro">EzBrickz es una aplicación iOS que reúne en un solo lugar cinco sistemas que hoy viven dispersos. El producto ya está construido y en funcionamiento.</p>
+    <div class="grid c3">
+      <div class="card"><h4>Inventario inteligente</h4><p style="color:var(--text-dim);font-size:.94rem">Catálogo completo de sets y minifiguras, piezas faltantes, estado de conservación, valuación y fotografías propias.</p></div>
+      <div class="card"><h4>Red social</h4><p style="color:var(--text-dim);font-size:.94rem">Feed, perfiles, seguidores y publicaciones por tipo, incluyendo novedades y filtraciones de la comunidad.</p></div>
+      <div class="card"><h4>Marketplace</h4><p style="color:var(--text-dim);font-size:.94rem">Venta, trueque, ofertas, reseñas de vendedor y conversaciones de compraventa con reputación verificable.</p></div>
+      <div class="card"><h4>Grupos con subastas</h4><p style="color:var(--text-dim);font-size:.94rem">Comunidades con pedidos de búsqueda, publicaciones compartidas y subastas en vivo con pujas y cuenta regresiva.</p></div>
+      <div class="card"><h4>Brickston</h4><p style="color:var(--text-dim);font-size:.94rem">Asistente que identifica piezas por fotografía y responde consultas sobre el catálogo.</p></div>
+      <div class="card" style="background:linear-gradient(120deg,rgba(56,191,255,.12),rgba(30,111,184,.05));border-color:var(--accent-deep)"><h4 style="color:var(--accent)">La diferencia</h4><p style="color:var(--text);font-size:.94rem">No es un marketplace con una red social añadida. Es una red social con un marketplace integrado, y ese orden lo cambia todo.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="traccion">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Estado actual</h2></div>
+    <p class="sec-intro">A diferencia de un proyecto en fase de idea, EzBrickz ya es un producto real y funcional. La inversión no se destina a empezar a construir, sino a crecer sobre una base que ya existe.</p>
+    <div class="traction">
+      <div class="tcard"><div class="v">MVP completo</div><div class="k">Producto funcional, no un prototipo</div></div>
+      <div class="tcard"><div class="v">5 sistemas</div><div class="k">Inventario, social, marketplace, grupos y asistente, ya integrados</div></div>
+      <div class="tcard"><div class="v">iOS</div><div class="k">Aplicación nativa lista para la App Store</div></div>
+      <div class="tcard"><div class="v">Listo para validar</div><div class="k">Con acceso directo a una comunidad de coleccionistas para pruebas tempranas</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="mercado">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="sec-num">04</span><h2>El mercado y la competencia</h2></div>
+    <p class="sec-intro">El coleccionismo de LEGO es un mercado global de miles de millones de dólares al año. Estos son los actores actuales, y todos comparten una misma carencia que abre espacio a EzBrickz. El dimensionamiento detallado se desarrolla en la sección de Clientes.</p>
+    <div class="grid c2">
+      <div class="card">
+        <h4>BrickLink <span class="tag threat">Líder</span></h4>
+        <p class="role">El referente del sector, propiedad de LEGO</p>
+        <ul>
+          <li class="plus">Catálogo de gran profundidad y más de un millón de miembros</li>
+          <li class="minus">Interfaz anticuada, atención impersonal y sin comunidad real</li>
+          <li class="minus">Retiró su marketplace de 35 países a inicios de 2026</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>BrickOwl <span class="tag weak">Retador</span></h4>
+        <p class="role">La alternativa más cuidada</p>
+        <ul>
+          <li class="plus">Interfaz limpia, comisiones bajas y registro sencillo</li>
+          <li class="minus">Comunidad reducida y funcionalidad aún limitada</li>
+          <li class="minus">Sin dimensión social: sigue siendo una tienda</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Rebrickable y Brickset <span class="tag comp">Complementarios</span></h4>
+        <p class="role">Catálogo y precios, no comercio</p>
+        <ul>
+          <li class="plus">Sólidos en catálogo, inventario y referencia de precios</li>
+          <li class="plus">Integrables como aliados, no como rivales directos</li>
+          <li class="minus">No permiten comprar, vender ni formar comunidad</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Canales informales <span class="tag chaos">El presente</span></h4>
+        <p class="role">Redes sociales y mensajería</p>
+        <ul>
+          <li class="plus">Sin barrera de entrada: la gente ya está ahí</li>
+          <li class="minus">Desordenados, sin protección ni reputación</li>
+          <li class="minus">Sin estructura para operar con seguridad</li>
+        </ul>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="stud-row"><i class="stud"></i><i class="stud"></i><i class="stud"></i></div>
+      <h3>Una ventana de oportunidad concreta</h3>
+      <p>El líder del sector se retiró de buena parte del mercado y dejó al resto de su base descontento con el servicio. La oportunidad no consiste en derrotar a un gigante intacto, sino en acoger a los coleccionistas que ese gigante dejó sin hogar.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="ingresos">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="sec-num">05</span><h2>El modelo de ingresos</h2></div>
+    <p class="sec-intro">La decisión que ordena todo el negocio es clara: EzBrickz <b style="color:var(--text)">no cobra comisión por las transacciones entre coleccionistas</b>. Comprar y vender es gratuito, y ese es el gran diferenciador frente a las plataformas establecidas. Los ingresos provienen de cuatro fuentes, ninguna de las cuales grava al coleccionista por operar.</p>
+    <div class="streams">
+      <div class="stream">
+        <div class="rank">Base</div>
+        <h4>Coleccionista</h4>
+        <p>Organiza, compra, vende y participa en la comunidad. Es la base amplia que da vida a la plataforma.</p>
+        <div class="free">Sin costo</div>
+      </div>
+      <div class="stream motor">
+        <div class="rank">Principal</div>
+        <h4>EzBusiness</h4>
+        <p>Software de gestión para vendedores profesionales. Es la fuente principal de ingresos.</p>
+        <div class="price">Suscripción</div>
+      </div>
+      <div class="stream">
+        <div class="rank">Complemento</div>
+        <h4>Publicidad</h4>
+        <p>Exclusivamente del mundo LEGO: marcas, tiendas y vendedores que pagan por destacar.</p>
+        <div class="price">Por campaña</div>
+      </div>
+      <div class="stream">
+        <div class="rank">Pasivo</div>
+        <h4>Afiliados</h4>
+        <p>Enlaces de compra a tiendas de sets nuevos. La comisión la asume el comercio, no el usuario.</p>
+        <div class="price">Por referido</div>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="stud-row"><i class="stud"></i><i class="stud"></i><i class="stud"></i></div>
+      <h3>Por qué no se cobra comisión por venta</h3>
+      <p>El cobro por transacción es justamente lo que vuelve pesadas a las plataformas establecidas para quien vende. Al renunciar a él, EzBrickz se convierte en el lugar natural para comprar y vender, y monetiza ofreciendo herramientas a quienes hacen de esto una actividad profesional, sin gravar a quienes lo viven como afición.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="ezbusiness">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="sec-num">06</span><h2>EzBusiness</h2></div>
+    <p class="sec-intro">La pieza central del modelo de ingresos. EzBusiness no consiste en vender dentro de la app, sino en ofrecer el software con el que un vendedor profesional opera todo su negocio de LEGO. El paralelo es Shopify: no cobra por cada venta, cobra por proporcionar el sistema completo de gestión.</p>
+    <div class="ezb">
+      <div class="ezb-head">
+        <div class="badge">Suscripción · fuente principal de ingresos</div>
+        <h3>El sistema de gestión para vendedores de LEGO</h3>
+        <p>Su valor se sostiene aun cuando el vendedor opere fuera de la app, en su local o en su propia web. Eso convierte a EzBrickz en la infraestructura de su negocio, no en un simple canal de venta.</p>
+      </div>
+      <div class="ezb-body">
+        <div class="col">
+          <h5>Lo que necesita un vendedor y un coleccionista no</h5>
+          <ul>
+            <li><b>Inventario profesional</b> para gestionar volumen, existencias, costos y márgenes</li>
+            <li><b>Identidad de marca</b> con tienda, nombre y presencia propios</li>
+            <li><b>Visibilidad</b> para llegar a más compradores dentro de la comunidad</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h5>Servicios que profundizan el valor</h5>
+          <ul>
+            <li><b>Indicadores y paneles</b> que presentan el negocio como un tablero de control</li>
+            <li><b>API de inventario</b> para operar el stock desde sistemas externos propios</li>
+            <li><b>Niveles de suscripción</b> que escalan del vendedor pequeño al grande</li>
+          </ul>
+        </div>
+      </div>
+      <div class="hook">
+        <h5>El argumento frente al líder</h5>
+        <p>En las plataformas establecidas, un vendedor de volumen entrega un porcentaje de cada venta, lo que supone una suma considerable cada mes. EzBrickz propone lo contrario: una cuota fija, y vender cuanto quiera sin ceder un porcentaje por operación.
+        <span class="quote">Una cuota fija por la herramienta. Vender sin comisiones.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="propuestas">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="sec-num">07</span><h2>Tres caminos de entrada</h2></div>
+    <p class="sec-intro"><b style="color:var(--text)">El mismo motor, distintos puntos de partida.</b> Las cuatro fuentes de ingreso aplican a las tres estrategias. Lo que cambia no es de dónde proviene el dinero, sino con qué propuesta se atrae a la masa inicial de coleccionistas, sin la cual no hay vendedores que paguen. Cada camino enciende el motor en un orden distinto.</p>
+
+    <div class="prop">
+      <div class="ph"><span class="letter">A</span><div class="badge">Enfoque comunidad</div><h3>La red social del coleccionista</h3><div class="tagline">El lugar donde los coleccionistas de LEGO pertenecen.</div></div>
+      <div class="pb">
+        <div class="field hookf full"><h5>La propuesta</h5><p>Atraer coleccionistas con la experiencia social: feed, grupos y reconocimiento. Llegan porque es el lugar donde se sienten parte de algo.</p></div>
+        <div class="field"><h5>Cómo se enciende el motor</h5><p>Primero se forma una comunidad activa. Una vez reunidos los coleccionistas, los vendedores profesionales quieren estar presentes, y entonces se activa EzBusiness. La publicidad encaja por la lealtad de la audiencia.</p></div>
+        <div class="field"><h5>Qué ingreso se activa primero</h5><p>Publicidad y afiliados, con EzBusiness madurando por detrás conforme crece la comunidad.<span class="money-line"><span class="mt on">Publicidad</span><span class="mt on">Afiliados</span><span class="mt">EzBusiness</span></span></p></div>
+        <div class="field"><h5>Su fortaleza</h5><p>Una comunidad no se reproduce copiando una función. Es la ventaja más difícil de imitar a largo plazo.</p></div>
+        <div class="field full risk"><h5>Su principal riesgo</h5><p>Una red social vale poco hasta alcanzar masa crítica. Es el arranque más lento de los tres.</p></div>
+      </div>
+    </div>
+
+    <div class="prop">
+      <div class="ph"><span class="letter">B</span><div class="badge">Enfoque marketplace</div><h3>El marketplace moderno y cercano</h3><div class="tagline">Comprar y vender LEGO sin complicaciones.</div></div>
+      <div class="pb">
+        <div class="field hookf full"><h5>La propuesta</h5><p>Atraer coleccionistas resolviendo el problema concreto de comprar y vender, aprovechando el vacío que dejó el líder. Llegan a operar sin comisiones.</p></div>
+        <div class="field"><h5>Cómo se enciende el motor</h5><p>Como vender es gratuito, la plataforma se llena pronto de actividad. Los vendedores de volumen llegan atraídos por la ausencia de comisiones y adoptan EzBusiness cuando necesitan herramientas profesionales.</p></div>
+        <div class="field"><h5>Qué ingreso se activa primero</h5><p>EzBusiness se activa rápido, porque los vendedores serios aparecen desde el inicio.<span class="money-line"><span class="mt on">EzBusiness</span><span class="mt on">Afiliados</span><span class="mt">Publicidad</span></span></p></div>
+        <div class="field"><h5>Su fortaleza</h5><p>Aprovecha de forma directa la ventana abierta por el líder, con una propuesta clara y una conversión a cliente de pago veloz.</p></div>
+        <div class="field full risk"><h5>Su principal riesgo</h5><p>Requiere oferta y demanda al mismo tiempo. Un marketplace vacío no le sirve a nadie.</p></div>
+      </div>
+    </div>
+
+    <div class="prop">
+      <div class="ph"><span class="letter">C</span><div class="badge">Enfoque inventario</div><h3>El centro de mando de tu colección</h3><div class="tagline">Tu colección de LEGO, finalmente bajo control.</div></div>
+      <div class="pb">
+        <div class="field hookf full"><h5>La propuesta</h5><p>Atraer coleccionistas con la mejor herramienta para organizar su colección. Llegan por pura utilidad, y siempre de forma gratuita: el inventario nunca se cobra.</p></div>
+        <div class="field"><h5>Cómo se enciende el motor</h5><p>Con la colección ya cargada, el paso natural es vender lo que sobra y comprar lo que falta. Los afiliados se activan pronto y los grandes vendedores adoptan EzBusiness con el tiempo.</p></div>
+        <div class="field"><h5>Qué ingreso se activa primero</h5><p>Afiliados primero y EzBusiness después. El inventario es el gancho, no la fuente de ingreso.<span class="money-line"><span class="mt on">Afiliados</span><span class="mt">EzBusiness</span><span class="mt">Publicidad</span></span></p></div>
+        <div class="field"><h5>Su fortaleza</h5><p>Es el mensaje más fácil de comunicar y el terreno donde el producto es hoy más sólido.</p></div>
+        <div class="field full risk"><h5>Su principal riesgo</h5><p>Organizar es lo más fácil de imitar, ya que otras herramientas lo ofrecen gratis, y la conversión a cliente de pago es la más lenta.</p></div>
+      </div>
+    </div>
+
+    <div class="tablewrap" style="margin-top:30px">
+      <table>
+        <thead><tr><th>Dimensión</th><th>A · Comunidad</th><th>B · Marketplace</th><th>C · Inventario</th></tr></thead>
+        <tbody>
+          <tr><td>Propuesta de entrada</td><td>Experiencia social</td><td>Comprar y vender sin comisión</td><td>Organizar la colección</td></tr>
+          <tr><td>Ingreso que se activa primero</td><td>Publicidad y afiliados</td><td>EzBusiness, de forma temprana</td><td>Afiliados</td></tr>
+          <tr><td>Motor de fondo</td><td>EzBusiness</td><td>EzBusiness</td><td>EzBusiness</td></tr>
+          <tr><td>Velocidad de arranque</td><td><span class="dot d-lo"></span>Lenta</td><td><span class="dot d-mid"></span>Media</td><td><span class="dot d-hi"></span>Alta</td></tr>
+          <tr><td>Ventaja sostenible</td><td><span class="dot d-hi"></span>Muy alta</td><td><span class="dot d-hi"></span>Alta</td><td><span class="dot d-lo"></span>Baja</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="vision">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="sec-num">08</span><h2>Visión a largo plazo</h2></div>
+    <p class="sec-intro">Más allá del producto actual, EzBrickz construye con el tiempo un activo que ningún competidor puede replicar: el conocimiento que surge de la actividad real de su propia comunidad.</p>
+    <div class="vision">
+      <div class="vcard">
+        <h4>Un índice de valor propio</h4>
+        <p>Con suficiente volumen de transacciones reales dentro de la plataforma, EzBrickz puede calcular el valor de mercado de cada set y minifigura a partir de ventas que de verdad ocurrieron, no de estimaciones externas. Es un dato que se vuelve más preciso a medida que crece la comunidad, y que la competencia no puede copiar porque pertenece a EzBrickz.</p>
+      </div>
+      <div class="vcard">
+        <h4>El efecto de red de los datos</h4>
+        <p>Cada nuevo usuario aporta más actividad, lo que mejora la calidad del dato, lo que atrae a más usuarios. Ese círculo virtuoso convierte la información de la comunidad en la ventaja más defendible del negocio y en el activo premium de EzBusiness.</p>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="stud-row"><i class="stud"></i><i class="stud"></i><i class="stud"></i></div>
+      <h3>La colección, con su valor a la vista</h3>
+      <p>La aplicación ya registra cuánto pagó el coleccionista por cada set. Al combinarlo con el valor de mercado, puede mostrar cómo evoluciona su colección en el tiempo. EzBrickz no es una plataforma de inversión; es la app del coleccionista. Pero poder ver el valor de lo que se ha reunido es una forma poderosa de honrar la afición y de mantener a la comunidad cerca.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <div class="logo" style="font-size:18px;margin-bottom:10px"><img src="EzBLogo.png" alt="EzBrickz" style="height:30px;width:auto;border-radius:7px"></div>
+      <div>Modelo de negocio · Visión general · Junio 2026</div>
+    </div>
+    <div style="color:var(--text-dim)">Mercado objetivo: USA, México y Latinoamérica</div>
+  </div>
+</footer>
+
+<script>
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

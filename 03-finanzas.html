@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EzBrickz · Finanzas</title>
+<style>
+  :root{
+    --bg:#0F141A;--surface:#1A222C;--elevated:#232E3A;--accent:#38BFFF;--accent-deep:#1E6FB8;
+    --text:#EAF1F7;--text-dim:#8FA3B5;--border:#2C3845;--danger:#E5604D;--success:#46C28E;--warning:#E8B34A;
+    --radius-sm:8px;--radius:14px;--radius-lg:22px;--maxw:1080px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .stud-row{display:flex;gap:7px;align-items:center}
+  .stud{width:13px;height:13px;border-radius:50%;background:var(--accent);box-shadow:inset 0 -2px 3px rgba(0,0,0,.35);display:inline-block}
+  .stud.dim{background:var(--border)}
+  header.topbar{position:sticky;top:0;z-index:50;background:rgba(15,20,26,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .logo{display:flex;align-items:center;gap:11px;font-weight:800;font-size:21px;letter-spacing:-.02em}
+  .logo span.blue{color:var(--accent)}
+  nav.tabs{display:flex;gap:4px;flex-wrap:wrap}
+  nav.tabs a{color:var(--text-dim);text-decoration:none;font-size:13.5px;font-weight:600;padding:8px 12px;border-radius:999px;transition:.2s}
+  nav.tabs a:hover{color:var(--text);background:var(--elevated)}
+  nav.tabs a.active{color:var(--accent);background:rgba(56,191,255,.12)}
+  @media(max-width:900px){nav.tabs{display:none}}
+  .hero{padding:80px 0 40px;position:relative}
+  .hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(900px 380px at 78% -8%,rgba(56,191,255,.16),transparent 70%)}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;margin-bottom:22px}
+  .hero h1{font-size:clamp(2.1rem,4.6vw,3.3rem);line-height:1.06;letter-spacing:-.03em;font-weight:850;max-width:18ch}
+  .hero p.lead{margin-top:20px;font-size:clamp(1.02rem,1.8vw,1.2rem);color:var(--text-dim);max-width:62ch}
+  section.block{padding:54px 0;border-top:1px solid var(--border)}
+  .sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:14px}
+  .sec-num{font-size:13px;font-weight:800;color:var(--accent);letter-spacing:.1em;border:1px solid var(--accent);border-radius:8px;padding:3px 9px;flex:none}
+  .sec-head h2{font-size:clamp(1.6rem,3.4vw,2.3rem);letter-spacing:-.02em;font-weight:800}
+  .sec-intro{color:var(--text-dim);font-size:1.05rem;max-width:74ch;margin-bottom:34px}
+  .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:760px){.tiers{grid-template-columns:1fr}}
+  .tier{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:26px;position:relative;transition:.2s}
+  .tier:hover{border-color:var(--accent-deep);transform:translateY(-3px)}
+  .tier.feat{background:linear-gradient(135deg,rgba(56,191,255,.1),rgba(30,111,184,.03));border-color:var(--accent-deep)}
+  .tier .name{font-size:.78rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  .tier .price{font-size:2.2rem;font-weight:850;letter-spacing:-.02em;line-height:1}
+  .tier .price span{font-size:.9rem;color:var(--text-dim);font-weight:600}
+  .tier ul{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:9px}
+  .tier li{font-size:.92rem;padding-left:22px;position:relative;color:var(--text)}
+  .tier li::before{content:"";position:absolute;left:0;top:7px;width:10px;height:10px;border-radius:3px;background:var(--accent)}
+  .tier .badge{position:absolute;top:18px;right:20px;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+  .cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:760px){.cards3{grid-template-columns:1fr}}
+  .ic{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px}
+  .ic .stage{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px}
+  .ic.feat .stage{color:var(--accent)}
+  .ic.feat{background:linear-gradient(135deg,rgba(56,191,255,.1),rgba(30,111,184,.03));border-color:var(--accent-deep)}
+  .ic .amt{font-size:1.6rem;font-weight:850;color:var(--accent);letter-spacing:-.01em;margin-bottom:4px;line-height:1.1}
+  .ic .users{font-size:.84rem;color:var(--text-dim);margin-bottom:12px}
+  .ic ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+  .ic li{font-size:.86rem;color:var(--text);display:flex;justify-content:space-between;gap:10px}
+  .ic li span{color:var(--text-dim)}
+  .tablewrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius);margin-top:8px}
+  table{width:100%;border-collapse:collapse;min-width:520px}
+  th,td{text-align:left;padding:13px 16px;font-size:.92rem;border-bottom:1px solid var(--border)}
+  thead th{background:var(--accent-deep);color:#fff;font-weight:700}
+  thead th:first-child{border-top-left-radius:var(--radius)}
+  thead th:last-child{border-top-right-radius:var(--radius)}
+  tbody tr:hover{background:var(--elevated)}
+  td:first-child{font-weight:700;color:var(--text-dim)}
+  td.hl{color:var(--accent);font-weight:700}
+  td.pos{color:var(--success);font-weight:700}
+  .ask{margin-top:8px;border-radius:var(--radius-lg);padding:30px 32px;background:linear-gradient(135deg,rgba(56,191,255,.12),rgba(30,111,184,.05));border:1px solid var(--accent-deep)}
+  .ask .stud-row{margin-bottom:16px}
+  .ask .amount{font-size:2.8rem;font-weight:850;color:var(--accent);letter-spacing:-.02em;line-height:1}
+  .ask .amount span{font-size:1rem;color:var(--text-dim);font-weight:600}
+  .ask .sub{color:var(--text);margin-top:8px;font-size:1rem}
+  .breakdown{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:8px}
+  @media(max-width:760px){.breakdown{grid-template-columns:1fr}}
+  .bcol h4{font-size:.95rem;color:var(--accent);margin-bottom:14px;letter-spacing:.04em;text-transform:uppercase;font-weight:800}
+  .brow{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);font-size:.94rem}
+  .brow span:first-child{color:var(--text)}
+  .brow span:last-child{color:var(--text);font-weight:700;white-space:nowrap}
+  .brow.tot{border-bottom:none;border-top:2px solid var(--accent-deep);margin-top:6px;padding-top:12px}
+  .brow.tot span{color:var(--accent);font-weight:800}
+  .use{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:24px}
+  @media(max-width:760px){.use{grid-template-columns:1fr}}
+  .u{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
+  .u.star{border-color:var(--accent-deep);background:rgba(56,191,255,.06)}
+  .u h5{font-size:.95rem;margin-bottom:4px;color:var(--text)}
+  .u p{font-size:.86rem;color:var(--text-dim)}
+  .u .pct{font-size:1.1rem;font-weight:800;color:var(--accent)}
+  .insight{margin-top:26px;border-radius:var(--radius-lg);padding:28px 30px;background:linear-gradient(135deg,rgba(56,191,255,.12),rgba(30,111,184,.05));border:1px solid var(--accent-deep)}
+  .insight .stud-row{margin-bottom:14px}
+  .insight h3{font-size:1.2rem;margin-bottom:8px}
+  .insight p{color:var(--text);font-size:1rem}
+  .note{margin-top:20px;border-radius:var(--radius);border:1px dashed var(--warning);background:rgba(232,179,74,.06);padding:18px 20px}
+  .note p{font-size:.9rem;color:var(--text)}
+  .note b{color:var(--warning)}
+  footer{border-top:1px solid var(--border);padding:40px 0 60px;color:var(--text-dim);font-size:.88rem}
+  footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:flex-end}
+  footer .logo{font-size:18px;margin-bottom:10px}
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap">
+    <div class="logo"><img src="EzBLogo.png" alt="EzBrickz" style="height:40px;width:auto;border-radius:9px"></div>
+    <nav class="tabs">
+      <a href="index.html">Visión general</a>
+      <a href="01-fundamentos.html">Fundamentos</a>
+      <a href="02-clientes.html">Clientes</a>
+      <a href="03-finanzas.html" class="active">Finanzas</a>
+      <a href="04-empresa.html">Empresa</a>
+      <a href="00-resumen.html">Resumen</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow"><span class="stud-row"><i class="stud"></i><i class="stud"></i><i class="stud dim"></i></span> Modelo de negocio · Finanzas</div>
+    <h1>Una estructura ligera y de alto margen.</h1>
+    <p class="lead">Cómo se fija el precio de EzBusiness, cuánto cuesta operar a cada escala, el margen que deja el modelo, cuándo se vuelve rentable y qué capital se busca, con el detalle de cómo se invierte. Los costos parten de tarifas reales y verificables.</p>
+  </div>
+</section>
+
+<section class="block" id="precios">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="sec-num">01</span><h2>Precio de EzBusiness</h2></div>
+    <p class="sec-intro">Tres niveles de suscripción que acompañan al vendedor desde que empieza hasta que opera a volumen. La propuesta es directa: una cuota fija mensual y cero comisión por venta, frente a plataformas que retienen entre el 6,5% y el 13% de cada operación o cobran entre 29 y 399 dólares al mes.</p>
+    <div class="tiers">
+      <div class="tier">
+        <div class="name">Básico</div>
+        <div class="price">$12<span> / mes</span></div>
+        <ul>
+          <li>Inventario profesional</li>
+          <li>Tienda con marca propia</li>
+          <li>Publicaciones ilimitadas, sin comisión</li>
+        </ul>
+      </div>
+      <div class="tier feat">
+        <div class="badge">Más popular</div>
+        <div class="name">Pro</div>
+        <div class="price">$29<span> / mes</span></div>
+        <ul>
+          <li>Todo lo del plan Básico</li>
+          <li>Indicadores y paneles del negocio</li>
+          <li>Mayor visibilidad ante compradores</li>
+        </ul>
+      </div>
+      <div class="tier">
+        <div class="name">Avanzado</div>
+        <div class="price">$59<span> / mes</span></div>
+        <ul>
+          <li>Todo lo del plan Pro</li>
+          <li>API de inventario para sistemas externos</li>
+          <li>Soporte prioritario</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note">
+      <p><b>Sobre estos precios:</b> son un punto de partida basado en referencias del mercado. El siguiente paso es confirmarlos en conversaciones con vendedores reales para medir su disposición a pagar antes de fijarlos.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="costos">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Costos de operación</h2></div>
+    <p class="sec-intro">EzBrickz no maneja inventario ni logística, así que sus costos son básicamente de infraestructura técnica y crecen de forma controlada con la cantidad de usuarios. Estos son los costos reales a tres escalas, con tarifas verificadas.</p>
+    <div class="cards3">
+      <div class="ic">
+        <div class="stage">Hoy · validación</div>
+        <div class="amt">~$8 / mes</div>
+        <div class="users">MVP, sin usuarios masivos</div>
+        <ul>
+          <li>Backend (plan gratuito) <span>$0</span></li>
+          <li>Cuenta Apple <span>$8</span></li>
+          <li>Asistente de IA <span>mínimo</span></li>
+        </ul>
+      </div>
+      <div class="ic">
+        <div class="stage">Al lanzar</div>
+        <div class="amt">~$35–85 / mes</div>
+        <div class="users">Primeros usuarios reales</div>
+        <ul>
+          <li>Backend (plan Pro) <span>$25+</span></li>
+          <li>Cuenta Apple <span>$8</span></li>
+          <li>Asistente de IA <span>variable</span></li>
+        </ul>
+      </div>
+      <div class="ic feat">
+        <div class="stage">Con escala</div>
+        <div class="amt">~$250–300 / mes</div>
+        <div class="users">Miles de usuarios activos</div>
+        <ul>
+          <li>Backend a escala <span>$150–200</span></li>
+          <li>Asistente de IA <span>$50–100</span></li>
+          <li>Cuenta Apple <span>$8</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="stud-row"><i class="stud"></i><i class="stud"></i><i class="stud"></i></div>
+      <h3>El dato que importa: el margen</h3>
+      <p>Incluso con miles de usuarios activos, la infraestructura cuesta alrededor de 300 dólares al mes. A esa misma escala, unos 150 vendedores suscritos a EzBusiness generan más de 4.000 dólares mensuales. Esa brecha es la marca de un negocio de software: un margen por encima del 90%, porque atender a un usuario más cuesta muy poco.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="proyeccion">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Proyección de ingresos</h2></div>
+    <p class="sec-intro">Cómo escalan los ingresos según la cantidad de vendedores suscritos a EzBusiness, a un precio promedio cercano al plan Pro y contrastados con el costo de infraestructura de cada etapa. Es un ejercicio para mostrar la mecánica del modelo, no una promesa de resultados.</p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Escenario</th><th>Vendedores de pago</th><th>Ingreso mensual</th><th>Costo infra.</th><th>Margen aprox.</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Inicial</td><td>25</td><td>$725</td><td>~$85</td><td class="pos">~$640</td></tr>
+          <tr><td>Crecimiento</td><td>150</td><td>$4.350</td><td>~$300</td><td class="pos">~$4.050</td></tr>
+          <tr><td>Consolidación</td><td class="hl">500</td><td class="hl">$14.500</td><td>~$600</td><td class="pos">~$13.900</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note">
+      <p><b>Cómo leer esta tabla:</b> el cálculo toma solo la suscripción de EzBusiness a 29 dólares promedio, sin sumar publicidad ni afiliados, que aportarían ingresos adicionales. El margen mostrado es sobre infraestructura; los sueldos del equipo se cubren con el capital de la ronda durante la etapa de crecimiento. Con cerca de 200 tiendas independientes y los vendedores que dejó libre el líder del sector, el escenario de consolidación es alcanzable.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="equilibrio">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="sec-num">04</span><h2>Punto de equilibrio</h2></div>
+    <p class="sec-intro">El momento en que los ingresos cubren el costo de infraestructura. Por lo ligero de la estructura, ese umbral se cruza con muy pocos vendedores de pago.</p>
+    <div class="cards3">
+      <div class="ic feat">
+        <div class="stage">Umbral real</div>
+        <div class="amt">3–4 vendedores</div>
+        <div class="users">cubren la infraestructura al lanzar</div>
+      </div>
+      <div class="ic">
+        <div class="stage">Margen por suscripción</div>
+        <div class="amt">+90%</div>
+        <div class="users">cada nuevo suscriptor es casi todo ganancia</div>
+      </div>
+      <div class="ic">
+        <div class="stage">Costo de inventario</div>
+        <div class="amt">$0</div>
+        <div class="users">no se compra ni almacena producto</div>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="stud-row"><i class="stud"></i><i class="stud"></i><i class="stud"></i></div>
+      <h3>La rentabilidad no es el reto; el volumen sí</h3>
+      <p>Tres o cuatro vendedores en el plan Pro bastan para cubrir la infraestructura al lanzar, y de ahí en adelante casi cada suscripción suma ganancia. Cada cliente es rentable desde el primer día; el desafío está en alcanzar volumen de usuarios, y a eso se destina la inversión.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="inversion">
+  <div class="wrap reveal">
+    <div class="sec-head"><span class="sec-num">05</span><h2>Capital necesario</h2></div>
+    <p class="sec-intro">El producto ya está construido, así que el capital no va a crear la app, sino a financiar 18 meses de operación, llevarla al mercado y construir los activos que la hacen difícil de copiar. Esta cifra está calculada a partir de costos concretos, no es una estimación redonda.</p>
+
+    <div class="ask">
+      <div class="stud-row"><i class="stud"></i><i class="stud"></i><i class="stud"></i></div>
+      <div class="amount">$40.000 <span>· ronda inicial · 18 meses de operación</span></div>
+      <p class="sub">Suma de los costos reales de equipo e infraestructura, los activos que se construyen una sola vez y una reserva para imprevistos.</p>
+
+      <div class="breakdown">
+        <div class="bcol">
+          <h4>Operación mensual · 18 meses</h4>
+          <div class="brow"><span>Fundador a tiempo completo</span><span>$400 / mes</span></div>
+          <div class="brow"><span>Dos practicantes (diseño y marketing)</span><span>$700 / mes</span></div>
+          <div class="brow"><span>Infraestructura (servidores, IA, Apple)</span><span>~$150 / mes</span></div>
+          <div class="brow tot"><span>Subtotal operación</span><span>~$22.500</span></div>
+        </div>
+        <div class="bcol">
+          <h4>Inversión única + reserva</h4>
+          <div class="brow"><span>Marketing y adquisición de usuarios</span><span>~$8.000</span></div>
+          <div class="brow"><span>Base de datos propia de LEGO</span><span>~$2.000</span></div>
+          <div class="brow"><span>Constitución legal (LLC en Florida)</span><span>~$2.000</span></div>
+          <div class="brow"><span>Reserva para imprevistos</span><span>~$5.500</span></div>
+          <div class="brow tot"><span>Subtotal único + reserva</span><span>~$17.500</span></div>
+        </div>
+      </div>
+
+      <div class="use">
+        <div class="u star"><div class="pct">~56%</div><h5>Equipo</h5><p>El fundador a tiempo completo y dos practicantes de diseño y marketing durante 18 meses. Es el rubro mayor: el equipo es lo que mueve el producto.</p></div>
+        <div class="u"><div class="pct">~20%</div><h5>Crecimiento</h5><p>Campañas para llevar la app a coleccionistas de USA, México y Latinoamérica.</p></div>
+        <div class="u"><div class="pct">~10%</div><h5>Activos y legal</h5><p>La base de datos propia de LEGO y la constitución formal de la empresa.</p></div>
+        <div class="u"><div class="pct">~14%</div><h5>Reserva</h5><p>Margen para imprevistos y para responder a lo que revele la validación.</p></div>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="stud-row"><i class="stud"></i><i class="stud"></i><i class="stud"></i></div>
+      <h3>Bajo capital, alto potencial</h3>
+      <p>EzBrickz necesita poco porque el producto ya existe y su estructura de costos es ligera. Con 40.000 dólares cubre 18 meses de operación, termina su módulo de ingresos, construye su base de datos propia y persigue la tracción que abre la siguiente etapa. Poco capital de entrada, un techo de crecimiento alto.</p>
+    </div>
+
+    <div class="note">
+      <p><b>Sobre esta cifra:</b> los costos de equipo e infraestructura son reales; el marketing y la base de datos son estimaciones de partida. El monto puede ajustarse según la ambición del plan de crecimiento, pero está construido sobre gastos concretos y verificables, no sobre una cifra redonda.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <div class="logo"><img src="EzBLogo.png" alt="EzBrickz" style="height:30px;width:auto;border-radius:7px"></div>
+      <div>Modelo de negocio · Finanzas · Junio 2026</div>
+    </div>
+    <div style="color:var(--text-dim)">Costos con tarifas reales · Proyecciones ilustrativas · Sujetas a validación</div>
+  </div>
+</footer>
+
+<script>
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
